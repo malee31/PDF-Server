@@ -1,11 +1,14 @@
-from PyPDF2 import PdfFileReader, PdfFileWriter
 import sys
 
-def getInfo(path):
+from PyPDF2 import PdfFileReader, PdfFileWriter
+
+
+def get_info(path):
 	with open(path, "rb") as file:
 		print(PdfFileReader(file).getDocumentInfo())
 
-def extractPage(path, page):
+
+def extract_page(path, page):
 	with open(path, "rb") as file:
 		pdf = PdfFileReader(file)
 		page = pdf.getPage(page)
@@ -13,6 +16,7 @@ def extractPage(path, page):
 		newpdf.addPage(page)
 		newpdf.write(open("test.pdf", "wb"))
 
-if(__name__ == "__main__"):
-	getInfo(sys.argv[1])
-	extractPage(sys.argv[1], int(sys.argv[2]))
+
+if __name__ == "__main__":
+	get_info(sys.argv[1])
+	extract_page(sys.argv[1], int(sys.argv[2]))
