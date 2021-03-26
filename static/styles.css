@@ -1,0 +1,29 @@
+* {
+    box-sizing: border-box;
+    font-family: arial, times, sans-serif;
+}
+
+body {
+    background-image: url("/static/background.jpg");
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    padding: 0;
+    margin: 0;
+}
+
+#clip {
+    background-image: url("/static/clipboard.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: calc(90vmin * 721 / 1052);
+    height: 90vmin;
+    padding: 19.5vmin 4vmin 4vmin;
+    margin: 5vmin auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
