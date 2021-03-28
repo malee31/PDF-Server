@@ -6,7 +6,15 @@
 	</head>
 	<body>
 		<div id="clip">
-			<p>Clipboard Content</p>
+			<h1 id="clip-title">Clipboard Content</h1>
+		<span class="input-row">
+			<p class="input-label">Select a PDF</p>
+			<select class="input-field">
+				{% for pdf_name in pdf_list %}
+					<option>{{ pdf_name }}</option>
+				{% endfor %}
+			</select>
+		</span>
 		</div>
 		<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="styles.css") }}">
 	</body>

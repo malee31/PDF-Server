@@ -11,6 +11,7 @@ body {
     background-repeat: no-repeat;
     padding: 0;
     margin: 0;
+    min-height: 95vh;
 }
 
 #clip {
@@ -18,12 +19,38 @@ body {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
-    width: calc(90vmin * 721 / 1052);
-    height: 90vmin;
-    padding: 19.5vmin 4vmin 4vmin;
+    width: calc(90vh * 721 / 1052);
+    height: 90vh;
+    padding: 19.5vh 4vh 4vh;
     margin: 5vmin auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+}
+
+#clip-title {
+    font-size: 2rem;
+    margin: 0 0 .5rem;
+}
+
+.input-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 6vh;
+}
+
+.input-label {
+    padding: 0;
+    margin: 0;
+    font-size: 1.3rem;
+    width: 40%;
+}
+
+.input-field {
+    width: 55%;
+    height: 5vh;
 }
