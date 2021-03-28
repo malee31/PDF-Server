@@ -1,21 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="UTF-8">
 		<title>PDF Server</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="styles.css") }}">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="UTF-8">
 	</head>
 	<body>
-		<div id="clip">
+		<form id="clip">
 			<h1 id="clip-title">Clipboard Content</h1>
-		<span class="input-row">
-			<p class="input-label">Select a PDF</p>
-			<select class="input-field">
-				{% for pdf_name in pdf_list %}
-					<option>{{ pdf_name }}</option>
-				{% endfor %}
-			</select>
-		</span>
-		</div>
-		<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="styles.css") }}">
+			<div class="input-row">
+				<p class="input-label">Select a PDF</p>
+				<select id="select-pdf" class="input-field">
+					{% for pdf_name in pdf_list %}
+						<option>{{ pdf_name }}</option>
+					{% endfor %}
+					<option>Custom Upload</option>
+				</select>
+			</div>
+			<label class="input-row input-label input-field hidden" id="pdf-upload-label">
+				<span>Upload a PDF</span>
+				<input type="file" accept="application/pdf" id="pdf-upload" class="hidden">
+			</label>
+			<div class="input-row">
+				<p class="input-label">Page Range</p>
+				<input type="text" id="page-range" class="input-field">
+			</div>
+		</form>
+		<script src="{{ url_for("static", filename="scripts.js") }}"></script>
 	</body>
 </html>

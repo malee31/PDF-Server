@@ -6,7 +6,6 @@ app = Flask(__name__, static_url_path="/static")
 pdfs = filter(lambda file: file.endswith(".pdf"), listdir("src/pdfs"))
 pdfs = list(map(lambda file: file[:-4], pdfs))
 pdfs.sort()
-print(pdfs)
 
 
 @app.route("/")
