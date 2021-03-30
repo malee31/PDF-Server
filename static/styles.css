@@ -54,12 +54,12 @@ body {
 	width: 55%;
 	height: 5vh;
 	background-color: white;
-	outline: none;
+	outline-color: #00A0D0;
 	border: 1px solid #888;
 	border-radius: 5px;
 }
 
-#pdf-upload-label {
+#pdf-upload-label, #submit-label {
 	width: 100%;
 	height: 5vh;
 	text-align: center;
