@@ -1,10 +1,14 @@
 from os import listdir, path, sep
-from flask import Flask, render_template, request
+from uuid import uuid4
+
+from flask import Flask, render_template, request, send_file
 from werkzeug.utils import secure_filename
+
 import extractPage
 
 app = Flask(__name__, static_url_path="/static")
 pdf_dir = path.join(path.dirname(path.realpath(__file__)), "src%spdfs" % sep)
+result_dir = path.join(path.dirname(path.realpath(__file__)), "src%sresults" % sep)
 pdfs = filter(lambda file: file.endswith(".pdf"), listdir(pdf_dir))
 pdfs = list(map(lambda file: file[:-4], pdfs))
 pdfs.sort()
@@ -51,11 +55,18 @@ def submit():
 		save_to = path.join(pdf_dir, save_to + ".pdf")
 		uploaded_file.save(save_to)
 
-	selected_pdf = path.join(pdf_dir, selected_pdf + ".pdf")
-	# TODO: Page number parsing and constructing PDF responses
-	result_pdf = extractPage.extract_range(selected_pdf, page_range)
-	print(result_pdf)
-	return "", 200
+	selected_pdf = selected_pdf
+	selected_path = path.join(pdf_dir, selected_pdf + ".pdf")
+	result_pdf = extractPage.extract_range(selected_path, page_range)
+	write_to = str(uuid4()) + ".pdf"
+	result_pdf.write(open(path.join(result_dir, write_to), "wb"))
+	return "/results/%s" % write_to, 200
+
+
+@app.route("/results/<file_name>", methods=["GET"])
+def results(file_name):
+	# TODO: Delete files after some time
+	return send_file(path.join(result_dir, file_name), as_attachment=True, attachment_filename=file_name + ".pdf", mimetype="application/pdf")
 
 
 if __name__ == "__main__":

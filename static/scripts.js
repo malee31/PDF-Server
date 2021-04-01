@@ -14,7 +14,7 @@ selectPDFInput.addEventListener("change", e => {
 	console.log(`PDF Selected: ${e.target.value}`);
 });
 
-const allowedKeys = "1234567890 -,";
+const allowedKeys = "1234567890-,";
 pageRangeInput.addEventListener("keypress", e => {
 	if(allowedKeys.includes(e.key)) console.log("Allowed");
 	else e.preventDefault();
@@ -31,8 +31,10 @@ form.addEventListener("submit", e => {
 
 	const req = new XMLHttpRequest();
 	req.addEventListener("load", () => {
-		if(req.status === 200) console.log("Success!");
-		else console.warn(`Irregular Status: ${req.statusText}`);
+		if(req.status === 200) {
+			console.log("Success!");
+			window.location.href = req.responseText;
+		} else console.warn(`Irregular Status: ${req.statusText}`);
 	});
 	req.addEventListener("error", console.error);
 	req.open("POST", `${window.location.origin}/submit`, true);

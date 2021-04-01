@@ -1,5 +1,6 @@
 import sys
 from os import sep
+
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
 
@@ -12,9 +13,9 @@ def extract_page(path, page):
 	with open(path, "rb") as file:
 		pdf = PdfFileReader(file)
 		page = pdf.getPage(page)
-		newpdf = PdfFileWriter()
-		newpdf.addPage(page)
-		newpdf.write(open("test.pdf", "wb"))
+		new_pdf = PdfFileWriter()
+		new_pdf.addPage(page)
+		new_pdf.write(open("test.pdf", "wb"))
 
 
 def extract_range(path, page_range):
