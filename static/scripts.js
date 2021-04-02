@@ -14,6 +14,13 @@ selectPDFInput.addEventListener("change", e => {
 	console.log(`PDF Selected: ${e.target.value}`);
 });
 
+uploadPDFInput.addEventListener("change", e => {
+	const files = e.target.files;
+	const uploadText = document.getElementById("upload-text")
+	if(files.length > 0 && files[0].name) uploadText.innerText = files[0].name;
+	else uploadText.innerText = "Upload a PDF";
+})
+
 const allowedKeys = "1234567890-,";
 pageRangeInput.addEventListener("keypress", e => {
 	if(allowedKeys.includes(e.key)) console.log("Allowed");
