@@ -14,6 +14,48 @@ body {
 	min-height: 95vh;
 }
 
+#error-box {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	min-width: 30%;
+	max-width: 60%;
+	min-height: 25%;
+	border-radius: .25rem;
+	margin: 0;
+	padding: 1rem 1.5rem;
+}
+
+#error-sub-box {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+#error-box-title {
+	font-weight: bold;
+	font-size: 1.5rem;
+	text-align: center;
+	margin: 0;
+}
+
+#error-box-text {
+	text-align: center;
+	margin: .5rem;
+}
+
+#error-box-dismiss {
+	width: 30%;
+	height: 2rem;
+}
+
 #clip {
 	background-image: url("/static/clipboard.png");
 	background-position: center center;

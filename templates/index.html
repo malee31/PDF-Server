@@ -7,18 +7,25 @@
 		<meta charset="UTF-8">
 	</head>
 	<body>
+		<div id="error-box" style="display: none">
+			<div>
+				<p id="error-box-title">Error</p>
+				<p id="error-box-text">There was a problem</p>
+			</div>
+			<button id="error-box-dismiss">Close</button>
+		</div>
 		<form id="clip">
 			<h1 id="clip-title">PDF Extraction Request Form</h1>
 			<div class="input-row">
 				<label for="select-pdf" class="input-label">Select a PDF</label>
 				<select id="select-pdf" class="input-field">
+					<option>Custom Upload</option>
 					{% for pdf_name in pdf_list %}
 						<option>{{ pdf_name }}</option>
 					{% endfor %}
-					<option>Custom Upload</option>
 				</select>
 			</div>
-			<label class="input-row input-label input-field hidden" id="pdf-upload-label">
+			<label class="input-row input-label input-field" id="pdf-upload-label">
 				<span id="upload-text">Upload a PDF</span>
 				<input type="file" accept="application/pdf" id="pdf-upload" class="hidden">
 			</label>
