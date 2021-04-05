@@ -1,7 +1,7 @@
 from os import listdir, path, sep
 from uuid import uuid4
 
-from flask import Flask, render_template, request, send_file
+from flask import Flask, redirect, render_template, request, send_file
 from werkzeug.utils import secure_filename
 
 import extractPage
@@ -55,16 +55,24 @@ def submit():
 		save_to = path.join(pdf_dir, save_to + ".pdf")
 		uploaded_file.save(save_to)
 
-	selected_pdf = selected_pdf
+	return "/results/%s" % process(selected_pdf, page_range), 200
+
+
+def process(selected_pdf, page_range):
 	selected_path = path.join(pdf_dir, selected_pdf + ".pdf")
-	result_pdf = extractPage.extract_range(selected_path, page_range)
 	write_to = str(uuid4()) + ".pdf"
-	result_pdf.write(open(path.join(result_dir, write_to), "wb"))
-	return "/results/%s" % write_to, 200
+	extractPage.extract_range(selected_path, page_range, path.join(result_dir, write_to))
+	return write_to
+
+
+@app.route("/redirect/<file_name>/<page_range>", methods=["GET"])
+def redirect_url(file_name, page_range):
+	return redirect("/results/%s" % process(file_name, page_range))
 
 
 @app.route("/results/<file_name>", methods=["GET"])
 def results(file_name):
+	print(file_name)
 	# TODO: Delete files after some time
 	return send_file(path.join(result_dir, file_name), as_attachment=True, attachment_filename=file_name + ".pdf", mimetype="application/pdf")
 

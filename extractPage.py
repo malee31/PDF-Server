@@ -18,7 +18,8 @@ def extract_page(path, page):
 		new_pdf.write(open("test.pdf", "wb"))
 
 
-def extract_range(path, page_range):
+def extract_range(path, page_range, write_to):
+	# print("Searching path %s" % path)
 	pdf_extract = PdfFileWriter()
 	with open(path, "rb") as file:
 		pdf = PdfFileReader(file)
@@ -26,8 +27,7 @@ def extract_range(path, page_range):
 		for page_num in range_list:
 			page_extract = pdf.getPage(page_num - 1)
 			pdf_extract.addPage(page_extract)
-		pdf_extract.write(open("src%(slash)spdfs%(slash)stest.pdf" % {"slash": sep}, "wb"))
-	return pdf_extract
+		pdf_extract.write(open(write_to, "wb"))
 
 
 def decompress_range(page_range, limit):
