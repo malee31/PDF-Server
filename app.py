@@ -1,4 +1,5 @@
-from os import listdir, path, sep
+from os import listdir, path, sep, unlink
+from shutil import rmtree
 from uuid import uuid4
 
 from flask import Flask, redirect, render_template, request, send_file
@@ -8,10 +9,23 @@ import extractPage
 
 app = Flask(__name__, static_url_path="/static")
 pdf_dir = path.join(path.dirname(path.realpath(__file__)), "src%spdfs" % sep)
-result_dir = path.join(path.dirname(path.realpath(__file__)), "src%sresults" % sep)
 pdfs = filter(lambda file: file.endswith(".pdf"), listdir(pdf_dir))
 pdfs = list(map(lambda file: file[:-4], pdfs))
 pdfs.sort()
+
+result_dir = path.join(path.dirname(path.realpath(__file__)), "src%sresults" % sep)
+for filename in listdir(result_dir):
+	delete_path = path.join(result_dir, filename)
+	try:
+		if path.isfile(delete_path) or path.islink(delete_path):
+			unlink(delete_path)
+		elif path.isdir(delete_path):
+			# Likely never going to be called
+			rmtree(delete_path)
+	except Exception as err:
+		print('Failed to delete %s\n%s' % (delete_path, err))
+
+cache = {}
 
 
 @app.route("/")
@@ -59,10 +73,15 @@ def submit():
 
 
 def process(selected_pdf, page_range):
-	selected_path = path.join(pdf_dir, selected_pdf + ".pdf")
-	write_to = str(uuid4()) + ".pdf"
-	extractPage.extract_range(selected_path, page_range, path.join(result_dir, write_to))
-	return write_to
+	if selected_pdf not in cache:
+		cache[selected_pdf] = {}
+	if page_range not in cache[selected_pdf]:
+		selected_path = path.join(pdf_dir, selected_pdf + ".pdf")
+		write_to = str(uuid4()) + ".pdf"
+		extractPage.extract_range(selected_path, page_range, path.join(result_dir, write_to))
+		cache[selected_pdf][page_range] = write_to
+
+	return cache[selected_pdf][page_range]
 
 
 @app.route("/redirect/<file_name>/<page_range>", methods=["GET"])
