@@ -7,12 +7,19 @@
 		<meta charset="UTF-8">
 	</head>
 	<body>
-		<div id="error-box" style="display: none">
+		<div id="error-box" class="modal" style="display: none">
 			<div>
-				<p id="error-box-title">Error</p>
-				<p id="error-box-text">There was a problem</p>
+				<p id="error-box-title" class="modal-title">Error</p>
+				<p id="error-box-text" class="modal-text">There was a problem</p>
 			</div>
-			<button id="error-box-dismiss">Close</button>
+			<button id="error-box-dismiss" class="modal-button">Close</button>
+		</div>
+		<div id="success-modal" class="modal" style="display: none">
+			<p id="success-modal-title" class="modal-title">Success!</p>
+			<div id="success-modal-choice-wrapper">
+				<button id="success-modal-view" class="modal-button">View</button>
+				<button id="success-modal-download" class="modal-button">Download</button>
+			</div>
 		</div>
 		<form id="clip">
 			<h1 id="clip-title">PDF Extraction Request Form</h1>

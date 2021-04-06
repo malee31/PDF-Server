@@ -14,7 +14,7 @@ body {
 	min-height: 95vh;
 }
 
-#error-box {
+.modal {
 	position: fixed;
 	top: 50%;
 	left: 50%;
@@ -24,36 +24,38 @@ body {
 	align-items: center;
 	transform: translate(-50%, -50%);
 	background-color: white;
-	min-width: 30%;
-	max-width: 60%;
+	min-width: 40%;
+	max-width: 90%;
 	min-height: 25%;
 	border-radius: .25rem;
 	margin: 0;
 	padding: 1rem 1.5rem;
 }
 
-#error-sub-box {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: center;
-}
-
-#error-box-title {
+.modal-title {
 	font-weight: bold;
 	font-size: 1.5rem;
 	text-align: center;
 	margin: 0;
 }
 
-#error-box-text {
+.modal-text {
 	text-align: center;
 	margin: .5rem;
 }
 
-#error-box-dismiss {
-	width: 30%;
+.modal-button {
+	min-width: 40%;
+	max-width: 50%;
 	height: 2rem;
+}
+
+#success-modal-choice-wrapper {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-around;
+	width: 100%;
 }
 
 #clip {

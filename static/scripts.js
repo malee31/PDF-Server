@@ -11,6 +11,15 @@ document.getElementById("error-box-dismiss").addEventListener("click", () => {
 	errorBox.style.display = "none";
 });
 
+const successModal = document.getElementById("success-modal");
+document.getElementById("success-modal-view").addEventListener("click", () => {
+	if(successModal.dataset.targetFilename) window.location.href = `/view/${successModal.dataset.targetFilename}`;
+});
+document.getElementById("success-modal-download").addEventListener("click", () => {
+	if(successModal.dataset.targetFilename) window.location.href = `/download/${successModal.dataset.targetFilename}`;
+	successModal.style.display = "none";
+});
+
 selectPDFInput.addEventListener("change", e => {
 	if(e.target.value === "Custom Upload") {
 		console.log("Custom Upload Selected");
@@ -42,6 +51,11 @@ function displayError(title, message) {
 	// console.error(message);
 }
 
+function createSuccessModal(targetFilename) {
+	successModal.dataset.targetFilename = targetFilename;
+	successModal.style.display = "";
+}
+
 form.addEventListener("submit", e => {
 	e.preventDefault();
 	const data = new FormData();
@@ -63,8 +77,8 @@ form.addEventListener("submit", e => {
 	const req = new XMLHttpRequest();
 	req.addEventListener("load", () => {
 		if(req.status === 200) {
-			console.log("Success!");
-			window.location.href = req.responseText;
+			console.log(`Success! Filepath ${req.responseText}`);
+			createSuccessModal(req.responseText);
 		} else console.warn(`Irregular Status: ${req.statusText}`);
 	});
 	req.addEventListener("error", err => {
