@@ -1,21 +1,4 @@
-import sys
-from os import sep
-
 from PyPDF2 import PdfFileReader, PdfFileWriter
-
-
-def get_info(path):
-	with open(path, "rb") as file:
-		print(PdfFileReader(file).getDocumentInfo())
-
-
-def extract_page(path, page):
-	with open(path, "rb") as file:
-		pdf = PdfFileReader(file)
-		page = pdf.getPage(page)
-		new_pdf = PdfFileWriter()
-		new_pdf.addPage(page)
-		new_pdf.write(open("test.pdf", "wb"))
 
 
 def extract_range(path, page_range, write_to):
@@ -56,8 +39,3 @@ def decompress_range(page_range, limit):
 				decompressed.append(page_num)
 
 	return decompressed
-
-
-if __name__ == "__main__":
-	get_info(sys.argv[1])
-	extract_page(sys.argv[1], int(sys.argv[2]))
