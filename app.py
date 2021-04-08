@@ -26,6 +26,7 @@ for filename in listdir(result_dir):
 		print('Failed to delete %s\n%s' % (delete_path, err))
 
 cache = {}
+original_filenames = {}
 
 
 @app.route("/")
@@ -80,6 +81,7 @@ def process(selected_pdf, page_range):
 		write_to = str(uuid4()) + ".pdf"
 		extractPage.extract_range(selected_path, page_range, path.join(result_dir, write_to))
 		cache[selected_pdf][page_range] = write_to
+		original_filenames[write_to] = selected_pdf
 
 	return cache[selected_pdf][page_range]
 
@@ -93,7 +95,7 @@ def redirect_url(file_name, page_range):
 def results(file_name):
 	print("Download Requested for %s" % file_name)
 	# TODO: Delete files after some time
-	return send_file(path.join(result_dir, file_name), as_attachment=True, attachment_filename=file_name + ".pdf", mimetype="application/pdf")
+	return send_file(path.join(result_dir, file_name), as_attachment=True, attachment_filename=(original_filenames[file_name] if file_name in original_filenames else file_name) + ".pdf", mimetype="application/pdf")
 
 
 @app.route("/view/<file_name>", methods=["GET"])
