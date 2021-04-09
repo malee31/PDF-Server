@@ -95,7 +95,9 @@ def redirect_url(file_name, page_range):
 def results(file_name):
 	print("Download Requested for %s" % file_name)
 	# TODO: Delete files after some time
-	return send_file(path.join(result_dir, file_name), as_attachment=True, attachment_filename=(original_filenames[file_name] if file_name in original_filenames else file_name) + ".pdf", mimetype="application/pdf")
+	new_filename = (original_filenames[file_name] if file_name in original_filenames else file_name) + ".pdf"
+	file_path = path.join(result_dir, file_name)
+	return send_file(file_path, as_attachment=True, attachment_filename=new_filename, mimetype="application/pdf")
 
 
 @app.route("/view/<file_name>", methods=["GET"])
