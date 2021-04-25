@@ -16,6 +16,8 @@ pdfs.sort()
 result_dir = path.join(path.dirname(path.realpath(__file__)), "src%sresults" % sep)
 for filename in listdir(result_dir):
 	delete_path = path.join(result_dir, filename)
+	if not delete_path.endswith(".pdf"):
+		continue
 	try:
 		if path.isfile(delete_path) or path.islink(delete_path):
 			unlink(delete_path)
@@ -51,7 +53,7 @@ def submit():
 			save_to = save_to[:-4]
 
 		if save_to in pdfs:
-			if len(save_to) == 0:
+			if int(len(save_to)) == 0:
 				print("Blank File Name Parsed From %s" % uploaded_file.filename)
 				save_to = "Temp"
 			file_name_counter = 1

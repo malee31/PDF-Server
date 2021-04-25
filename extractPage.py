@@ -4,43 +4,42 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 
 
 def extract_range(path, page_range, write_to):
-	# print("Searching path %s" % path)
-	pdf_extract = PdfFileWriter()
-	with open(path, "rb") as file:
-		pdf = PdfFileReader(file)
-		range_list = decompress_range(page_range, pdf.getNumPages())
-		pdf_extract.addMetadata({
-			"/Title": re.search("[\\d\\w]+(?=\\.pdf$)", path, re.IGNORECASE).group(0)
-		})
-		for page_num in range_list:
-			page_extract = pdf.getPage(page_num - 1)
-			pdf_extract.addPage(page_extract)
-		pdf_extract.write(open(write_to, "wb"))
+    # print("Searching path %s" % path)
+    pdf_extract = PdfFileWriter()
+    with open(path, "rb") as file:
+        pdf = PdfFileReader(file)
+        range_list = decompress_range(page_range, pdf.getNumPages())
+        pdf_extract.addMetadata({
+            "/Title": re.search("[\\d\\w]+(?=\\.pdf$)", path, re.IGNORECASE).group(0)
+        })
+        for page_num in range_list:
+            page_extract = pdf.getPage(page_num - 1)
+            pdf_extract.addPage(page_extract)
+        pdf_extract.write(open(write_to, "wb"))
 
 
 def decompress_range(page_range, limit):
-	decompressed = []
-	separate = page_range.split(",")
-	for sub_range in separate:
-		sub_range = sub_range.strip()
-		if sub_range[0] == "-":
-			sub_range = "1" + sub_range
+    decompressed = []
+    separate = page_range.split(",")
+    for sub_range in separate:
+        sub_range = sub_range.strip()
+        if sub_range[0] == "-":
+            sub_range = "1" + sub_range
 
-		if "-" not in sub_range:
-			sub_range = int(sub_range)
-			if sub_range > limit or sub_range <= 0:
-				continue
-			decompressed.append(int(sub_range))
-		else:
-			range_edges = sub_range.split("-")
-			if len(range_edges) == 1:
-				range_edges.append(limit)
+        if "-" not in sub_range:
+            sub_range = int(sub_range)
+            if sub_range > limit or sub_range <= 0:
+                continue
+            decompressed.append(int(sub_range))
+        else:
+            range_edges = sub_range.split("-")
+            if int(len(range_edges)) == 1:
+                range_edges.append(limit)
 
-			for page_num in range(int(range_edges[0]), int(range_edges[-1]) + 1):
-				if page_num <= 0:
-					continue
-				if page_num > limit:
-					break
-				decompressed.append(page_num)
-
-	return decompressed
+            for page_num in range(int(range_edges[0]), int(range_edges[-1]) + 1):
+                if page_num <= 0:
+                    continue
+                if page_num > limit:
+                    break
+                decompressed.append(page_num)
+    return decompressed
