@@ -1,20 +1,20 @@
 import re
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from PyPDF2 import PdfReader, PdfWriter
 
 
 def extract_range(path, page_range, write_to):
     # print("Searching path %s" % path)
-    pdf_extract = PdfFileWriter()
+    pdf_extract = PdfWriter()
     with open(path, "rb") as file:
-        pdf = PdfFileReader(file)
-        range_list = decompress_range(page_range, pdf.getNumPages())
-        pdf_extract.addMetadata({
-            "/Title": re.search("[\\d\\w]+(?=\\.pdf$)", path, re.IGNORECASE).group(0)
-        })
+        pdf = PdfReader(file)
+        range_list = decompress_range(page_range, len(pdf.pages))
+        # pdf_extract.addMetadata({
+        #     "/Title": re.search("[\\d\\w]+(?=\\.pdf$)", path, re.IGNORECASE).group(0)
+        # })
         for page_num in range_list:
-            page_extract = pdf.getPage(page_num - 1)
-            pdf_extract.addPage(page_extract)
+            page_extract = pdf.pages[page_num - 1]
+            pdf_extract.add_page(page_extract)
         pdf_extract.write(open(write_to, "wb"))
 
 
