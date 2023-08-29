@@ -18,6 +18,7 @@ def extract_range(path, page_range, write_to):
         pdf_extract.write(open(write_to, "wb"))
 
 
+# Converts a range string like "1,2,3-6" to a list like [1, 2, 3, 4, 5, 6]
 def decompress_range(page_range, limit):
     decompressed = []
     separate = page_range.split(",")

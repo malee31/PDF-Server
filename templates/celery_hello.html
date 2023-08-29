@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>PDF Server | Celery Test</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="styles.css") }}">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<h1>Task started with id: {{ celery_task_id }}</h1>
+		<progress id="celery-progress"></progress>
+
+		<script>
+		{#	Inline script for spamming for progress		#}
+		const taskId = "{{ celery_task_id }}";
+		const progressElem = document.getElementById("celery-progress");
+
+		// Check progress every 0.5s
+		const intervalId = setInterval(() => {
+			fetch(`/celery_hello/${taskId}`)
+				.then(res => res.text())
+				.then(responseText => {
+					if(responseText.startsWith("{")) {
+						const responseJSON = JSON.parse(responseText);
+						console.log(responseJSON)
+						progressElem.value = responseJSON.current;
+						progressElem.max = responseJSON.total;
+					} else {
+						console.log(responseText);
+						clearInterval(intervalId);
+						progressElem.value = 100;
+						progressElem.max = 100;
+					}
+				});
+		}, 500);
+		</script>
+	</body>
+</html>

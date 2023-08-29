@@ -4,14 +4,17 @@
 }
 
 body {
+	padding: 0;
+	margin: 0;
+	min-height: 95vh;
+}
+
+.background-wood {
 	background-image: url("/static/background.jpg");
 	background-attachment: fixed;
 	background-size: cover;
 	background-position: center center;
 	background-repeat: no-repeat;
-	padding: 0;
-	margin: 0;
-	min-height: 95vh;
 }
 
 .modal {
@@ -99,7 +102,7 @@ body {
 	height: 5vh;
 	background-color: white;
 	outline-color: #00A0D0;
-	border: 1px solid #888;
+	border: 1px solid #888888;
 	border-radius: 5px;
 }
 
