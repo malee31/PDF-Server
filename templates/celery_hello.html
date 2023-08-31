@@ -9,6 +9,7 @@
 	<body>
 		<h1>Task started with id: {{ celery_task_id }}</h1>
 		<progress id="celery-progress"></progress>
+		<a href="/celery_hello/status/{{ celery_task_id }}">Link</a>
 
 		<script>
 		{#	Inline script for spamming for progress		#}

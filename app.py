@@ -45,10 +45,26 @@ def celery_hello():
     return render_template("celery_hello.html", celery_task_id=res.task_id)
 
 
+@app.route("/celery_hello/status/<task_id>")
+def celery_hello_status(task_id):
+    print(hello)
+    return render_template("celery_hello.html", celery_task_id=task_id)
+
+
 @app.route("/celery_hello/<task_id>")
 def celery_hello_progress(task_id):
     res = AsyncResult(task_id, app=celery_app)
     response = make_response(json.dumps(res.info), 200)
+    response.mimetype = "text/plain"
+    return response
+
+
+
+@app.route("/celery_hello/end/<task_id>")
+def celery_hello_fin(task_id):
+    res = AsyncResult(task_id, app=celery_app)
+    res.get()
+    response = make_response(json.dumps(res.result), 200)
     response.mimetype = "text/plain"
     return response
 
