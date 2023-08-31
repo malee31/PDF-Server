@@ -74,17 +74,19 @@ form.addEventListener("submit", e => {
 	}
 	data.append("pageRange", pageRangeInput.value.replace(/[^0-9,-]/g, ""));
 
-	const req = new XMLHttpRequest();
-	req.addEventListener("load", () => {
-		if(req.status === 200) {
-			console.log(`Success! Filepath ${req.responseText}`);
-			createSuccessModal(req.responseText);
-		} else console.warn(`Irregular Status: ${req.statusText}`);
+	fetch(`${window.location.origin}/submit`, {
+		method: "POST",
+		body: data
+	}).then(res => {
+		console.log(res)
+		if(res.status === 200) {
+			res.text().then(text => createSuccessModal(text))
+		} else if(res.status === 202) {
+			res.text().then(text => window.location = text)
+		} else {
+			console.warn(`Irregular Status: ${res.statusText}`)
+		}
+	}).catch(err => {
+		displayError(`Error ${err.status}`, res.statusText);
 	});
-	req.addEventListener("error", err => {
-		console.error(err);
-		displayError(`Error ${err.status}`, req.statusText);
-	});
-	req.open("POST", `${window.location.origin}/submit`, true);
-	req.send(data);
 });

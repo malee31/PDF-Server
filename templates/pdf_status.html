@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>PDF Server | Celery Test</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="styles.css") }}">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<h1>Task started with id: {{ celery_task_id }}</h1>
+		<progress id="celery-progress"></progress>
+		<div id="results" style="display: none">
+			<a id="view-link" href="#">View File</a>
+			<a id="download-link" href="#">Download File</a>
+		</div>
+
+		<script>
+		{#	Inline script for spamming for progress		#}
+		const taskId = "{{ celery_task_id }}";
+		const progressElem = document.getElementById("celery-progress");
+
+		// Check progress every 0.5s
+		const intervalId = setInterval(() => {
+			fetch(`/view/status/poll/${taskId}`)
+				.then(res => res.json())
+				.then(res => {
+					if(res.pending) {
+						console.log("Pending...")
+					} else if(res.current !== undefined) {
+						progressElem.value = res.current;
+						progressElem.max = res.total;
+					} else {
+						const results = document.getElementById("results");
+						results.style.display = "block";
+
+						const viewLink = document.getElementById("view-link");
+						const downloadLink = document.getElementById("download-link");
+						viewLink.href = `/view/${res.result}`;
+						downloadLink.href = `/download/${res.result}`;
+
+						clearInterval(intervalId);
+						progressElem.value = 100;
+						progressElem.max = 100;
+					}
+				});
+		}, 500);
+		</script>
+	</body>
+</html>

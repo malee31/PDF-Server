@@ -1,5 +1,4 @@
 import re
-
 from PyPDF2 import PdfReader, PdfWriter
 
 
