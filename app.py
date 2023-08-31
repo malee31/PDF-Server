@@ -6,9 +6,8 @@ from uuid import uuid4
 from flask import Flask, redirect, render_template, request, send_file, make_response, url_for
 from werkzeug.utils import secure_filename
 
-import extractPage
-from celery_tasks import celery_app, hello, bg_extract
 from celery.result import AsyncResult
+from celery_tasks import celery_app, bg_extract
 
 app = Flask(__name__, static_url_path="/static")
 pdf_dir = path.join(path.dirname(path.realpath(__file__)), "src%spdfs" % sep)
@@ -37,23 +36,6 @@ def delete_cached_results():
 delete_cached_results()
 
 
-@app.route("/")
-def home():
-    return render_template("index.html", pdf_list=pdfs)
-
-
-@app.route("/celery_hello")
-def celery_hello():
-    res = hello.delay()
-    return render_template("celery_hello.html", celery_task_id=res.task_id)
-
-
-@app.route("/celery_hello/status/<task_id>")
-def celery_hello_status(task_id):
-    print(hello)
-    return render_template("celery_hello.html", celery_task_id=task_id)
-
-
 def find_valid_filename(_basename):
     basename = secure_filename(_basename)
     if basename.endswith(".pdf"):
@@ -76,6 +58,20 @@ def find_valid_filename(_basename):
                 raise Exception("Error finding a filename for %s extracted from %s" % (basename, _basename))
 
     return basename
+
+
+def process(selected_pdf, page_range):
+    selected_path = path.join(pdf_dir, selected_pdf + ".pdf")
+    write_to = f"{selected_pdf} - {str(uuid4())}.pdf"
+
+    pdf_extract_task = bg_extract.delay(selected_path, page_range, path.join(result_dir, write_to))
+
+    return pdf_extract_task.task_id
+
+
+@app.route("/")
+def home():
+    return render_template("index.html", pdf_list=pdfs)
 
 
 @app.route("/submit", methods=["POST"])
@@ -102,18 +98,15 @@ def submit():
     return url_for("view_status", task_id=pdf_extract_task_id), 202
 
 
-def process(selected_pdf, page_range):
-    selected_path = path.join(pdf_dir, selected_pdf + ".pdf")
-    write_to = f"{selected_pdf} - {str(uuid4())}.pdf"
-
-    pdf_extract_task = bg_extract.delay(selected_path, page_range, path.join(result_dir, write_to))
-
-    return pdf_extract_task.task_id
-
-
 @app.route("/redirect/<file_name>/<page_range>", methods=["GET"])
 def redirect_url(file_name, page_range):
     return redirect("/view/status/%s" % process(file_name, page_range))
+
+
+@app.route("/view/<file_name>", methods=["GET"])
+def view(file_name):
+    print("View Requested for %s" % file_name)
+    return send_file(path.join(result_dir, file_name), mimetype="application/pdf")
 
 
 @app.route("/download/<file_name>", methods=["GET"])
@@ -123,6 +116,11 @@ def results(file_name):
     new_filename = f"{file_name}.pdf"
     file_path = path.join(result_dir, file_name)
     return send_file(file_path, as_attachment=True, download_name=new_filename, mimetype="application/pdf")
+
+
+@app.route("/view/status/<task_id>", methods=["GET"])
+def view_status(task_id):
+    return render_template("pdf_status.html", celery_task_id=task_id)
 
 
 @app.route("/view/status/poll/<task_id>", methods=["GET"])
@@ -137,17 +135,6 @@ def view_status_poll(task_id):
 
     response.mimetype = "application/json"
     return response
-
-
-@app.route("/view/status/<task_id>", methods=["GET"])
-def view_status(task_id):
-    return render_template("pdf_status.html", celery_task_id=task_id)
-
-
-@app.route("/view/<file_name>", methods=["GET"])
-def view(file_name):
-    print("View Requested for %s" % file_name)
-    return send_file(path.join(result_dir, file_name), mimetype="application/pdf")
 
 
 if __name__ == "__main__":
