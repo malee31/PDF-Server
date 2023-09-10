@@ -1,5 +1,6 @@
-from PyPDF2 import PdfWriter, PdfReader
+import re
 from celery import Celery
+from PyPDF2 import PdfWriter, PdfReader
 import extractPage
 
 celery_app = Celery("celery_hello", broker="redis://localhost/0", backend="redis://localhost/0")
@@ -7,14 +8,14 @@ celery_app = Celery("celery_hello", broker="redis://localhost/0", backend="redis
 
 @celery_app.task(bind=True)
 def bg_extract(self, pdf_path, page_range, write_to):
-    # print("Searching path %s" % path)
+    # print("Searching path %s" % pdf_path)
     pdf_extract = PdfWriter()
     with open(pdf_path, "rb") as input_file:
         pdf = PdfReader(input_file)
         range_list = extractPage.decompress_range(page_range, len(pdf.pages))
-        # pdf_extract.addMetadata({
-        #     "/Title": re.search("[\\d\\w]+(?=\\.pdf$)", path, re.IGNORECASE).group(0)
-        # })
+        pdf_extract.add_metadata({
+            "/Title": pdf.metadata.title or re.search(r'[^\\/]+(?=\.pdf$)', pdf_path, re.IGNORECASE).group(0)
+        })
         self.update_state(state="PROGRESS", meta={"current": 0, "total": len(range_list)})
         for progress, page_num in enumerate(range_list):
             page_extract = pdf.pages[page_num - 1]
