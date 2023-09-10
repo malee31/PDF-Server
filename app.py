@@ -126,7 +126,7 @@ def view_status(task_id):
 @app.route("/view/status/poll/<task_id>", methods=["GET"])
 def view_status_poll(task_id):
     res = AsyncResult(task_id, app=celery_app)
-    if res.info is None:
+    if res.info is not None and res.status != "SUCCESS":
         response = make_response(json.dumps(res.info), 200)
     elif res.result is not None:
         response = make_response(json.dumps({"result": path.basename(res.result)}), 200)

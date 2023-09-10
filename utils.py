@@ -1,4 +1,3 @@
-# Converts a range string like "1,2,3-6" to a list like [1, 2, 3, 4, 5, 6]
 def decompress_range(page_range, limit):
     decompressed = []
     separate = page_range.split(",")
@@ -24,3 +23,16 @@ def decompress_range(page_range, limit):
                     break
                 decompressed.append(page_num)
     return decompressed
+
+
+def debug_celery_update_state(*args, **kwargs):
+    if len(args):
+        print(args)
+    if len(kwargs):
+        print(kwargs)
+
+
+def choose_update_state_func(celery_task=None):
+    if celery_task is not None:
+        return celery_task.update_state
+    return debug_celery_update_state

@@ -1,26 +1,21 @@
-import re
+from functools import wraps
 from celery import Celery
-from PyPDF2 import PdfWriter, PdfReader
-import extractPage
+import tasks_source as unwrapped_tasks
 
-celery_app = Celery("celery_hello", broker="redis://localhost/0", backend="redis://localhost/0")
+celery_app = Celery("pdf_tasks", broker="redis://localhost/0", backend="redis://localhost/0")
 
 
-@celery_app.task(bind=True)
-def bg_extract(self, pdf_path, page_range, write_to):
-    # print("Searching path %s" % pdf_path)
-    pdf_extract = PdfWriter()
-    with open(pdf_path, "rb") as input_file:
-        pdf = PdfReader(input_file)
-        range_list = extractPage.decompress_range(page_range, len(pdf.pages))
-        pdf_extract.add_metadata({
-            "/Title": pdf.metadata.title or re.search(r'[^\\/]+(?=\.pdf$)', pdf_path, re.IGNORECASE).group(0)
-        })
-        self.update_state(state="PROGRESS", meta={"current": 0, "total": len(range_list)})
-        for progress, page_num in enumerate(range_list):
-            page_extract = pdf.pages[page_num - 1]
-            pdf_extract.add_page(page_extract)
-            self.update_state(state="PROGRESS", meta={"current": progress, "total": len(range_list)})
+# Decorator that passes the celery task as `celery_task` to the wrapped function
+def celery_wrap(func):
+    @celery_app.task(bind=True)
+    @wraps(func)
+    def wrapped(self, *args, **kwargs):
+        self.update_state(state="PROGRESS", meta={"current": 1, "total": 10000, "loading": 999})
+        return func(*args, **kwargs, celery_task=self)
 
-    pdf_extract.write(open(write_to, "wb"))
-    return write_to
+    return wrapped
+
+
+# Wrap and re-export functions for Celery
+# Used because Celery makes debugging difficult so code will live outside of Celery and be wrapped into it
+bg_extract = celery_wrap(unwrapped_tasks.bg_extract)
