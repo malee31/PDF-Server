@@ -1,8 +1,7 @@
 # Converts a range string like "1,2,3-6" to a list like [1, 2, 3, 4, 5, 6]
 import os.path
 import re
-import time
-from PyPDF2 import PdfWriter, PdfReader
+from pypdf import PdfWriter, PdfReader
 
 from utils import decompress_range, choose_update_state_func
 
