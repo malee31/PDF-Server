@@ -2,7 +2,12 @@ from functools import wraps
 from celery import Celery
 import tasks_source as unwrapped_tasks
 
-celery_app = Celery("pdf_tasks", broker="redis://localhost/0", backend="redis://localhost/0")
+celery_app = Celery(
+    "pdf_tasks",
+    broker="redis://localhost/0",
+    backend="redis://localhost/0",
+    broker_connection_retry_on_startup=True
+)
 
 
 # Decorator that passes the celery task as `celery_task` to the wrapped function
@@ -10,7 +15,7 @@ def celery_wrap(func):
     @celery_app.task(bind=True)
     @wraps(func)
     def wrapped(self, *args, **kwargs):
-        self.update_state(state="PROGRESS", meta={"current": 1, "total": 10000, "loading": 999})
+        self.update_state(state="STARTED")
         return func(*args, **kwargs, celery_task=self)
 
     return wrapped
