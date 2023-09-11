@@ -90,6 +90,19 @@ body {
 	height: 6vh;
 }
 
+.input-col {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.checkbox-row {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	padding: 8px 0;
+}
+
 .input-label {
 	padding: 0;
 	margin: 0;

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>PDF Server</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="styles.css") }}">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="UTF-8">
+	</head>
+	<body class="background-wood">
+		<div id="error-box" class="modal" style="display: none">
+			<div>
+				<p id="error-box-title" class="modal-title">Error</p>
+				<p id="error-box-text" class="modal-text">There was a problem</p>
+			</div>
+			<button id="error-box-dismiss" class="modal-button">Close</button>
+		</div>
+		<div id="success-modal" class="modal" style="display: none">
+			<p id="success-modal-title" class="modal-title">Success!</p>
+			<div id="success-modal-choice-wrapper">
+				<button id="success-modal-view" class="modal-button">View</button>
+				<button id="success-modal-download" class="modal-button">Download</button>
+			</div>
+		</div>
+		<form id="clip">
+			<h1 id="clip-title">PDF Merge Request Form</h1>
+			<div class="input-col">
+				<label for="select-pdf" class="input-label">Select PDFs to Merge</label>
+				{% for pdf_name in pdf_list %}
+					<label class="checkbox-row">
+						<input type="checkbox" name="selected-pdfs[]" value="{{ pdf_name }}"/>
+						<span>{{ pdf_name }}</span>
+					</label>
+				{% endfor %}
+			</div>
+			<label class="input-row input-label input-field" id="submit-label">
+				<span>Merge PDFs</span>
+				<input type="submit" class="hidden">
+			</label>
+		</form>
+		<script src="{{ url_for("static", filename="merge-scripts.js") }}"></script>
+	</body>
+</html>

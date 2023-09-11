@@ -1,13 +1,12 @@
 import json
-from os import listdir, path, sep, unlink
-from shutil import rmtree
+from os import listdir, path, sep
 from uuid import uuid4
 
-from flask import Flask, redirect, render_template, request, send_file, make_response, url_for
-from werkzeug.utils import secure_filename
-
 from celery.result import AsyncResult
+from flask import Flask, redirect, render_template, request, send_file, make_response, url_for
+
 from celery_tasks import celery_app, bg_extract
+from utils import clear_directory, find_valid_filename
 
 app = Flask(__name__, static_url_path="/static")
 pdf_dir = path.join(path.dirname(path.realpath(__file__)), "src%spdfs" % sep)
@@ -17,47 +16,22 @@ pdfs.sort()
 
 result_dir = path.join(path.dirname(path.realpath(__file__)), "src%sresults" % sep)
 
-
-def delete_cached_results():
-    for filename in listdir(result_dir):
-        delete_path = path.join(result_dir, filename)
-        if not delete_path.endswith(".pdf"):
-            continue
-        try:
-            if path.isfile(delete_path) or path.islink(delete_path):
-                unlink(delete_path)
-            elif path.isdir(delete_path):
-                # Likely never going to be called
-                rmtree(delete_path)
-        except Exception as err:
-            print('Failed to delete %s\n%s' % (delete_path, err))
+clear_directory(result_dir)
 
 
-delete_cached_results()
+def save_uploaded(uploaded_file):
+    if not uploaded_file.mimetype == "application/pdf":
+        print("Mimetype Mismatch: %s" % uploaded_file.mimetype)
+        return "Not a PDF", 400
 
+    save_to = find_valid_filename(uploaded_file.filename, pdfs)
 
-def find_valid_filename(_basename):
-    basename = secure_filename(_basename)
-    if basename.endswith(".pdf"):
-        basename = basename[:-4]
+    pdfs.append(save_to)
+    pdfs.sort()
+    save_to = path.join(pdf_dir, save_to + ".pdf")
+    uploaded_file.save(save_to)
 
-    if int(len(basename)) == 0:
-        print("Blank File Name Parsed From %s" % _basename)
-        basename = "Temp"
-
-    if basename in pdfs:
-        file_name_counter = 1
-        while True:
-            suggested_file_name = "%s (%d)" % (basename, file_name_counter)
-            if suggested_file_name not in pdfs:
-                basename = suggested_file_name
-                break
-            file_name_counter += 1
-            # Arbitrary limit for amount of attempts to find a valid file name
-            if file_name_counter > 200:
-                raise Exception("Error finding a filename for %s extracted from %s" % (basename, _basename))
-
-    return basename
+    return save_to
 
 
 def process(selected_pdf, page_range):
@@ -74,6 +48,19 @@ def home():
     return render_template("index.html", pdf_list=pdfs)
 
 
+@app.route("/merge")
+def merge():
+    return render_template("merge.html", pdf_list=pdfs)
+
+
+@app.route("/merge/submit", methods=["POST"])
+def merge_submit():
+    merge_paths = [path.join(pdf_dir, file_name + ".pdf") for file_name in request.form.getlist("selected-pdfs[]")]
+    print(merge_paths)
+    # TODO: Test merging in Celery then test scheduled merged in Celery
+    return make_response("WIP")
+
+
 @app.route("/submit", methods=["POST"])
 def submit():
     page_range = request.form["pageRange"]
@@ -81,18 +68,7 @@ def submit():
         # TODO: Resolve the path
         selected_pdf = request.form["selectedPDF"]
     else:
-        uploaded_file = request.files["uploadedPDF"]
-        if not uploaded_file.mimetype == "application/pdf":
-            print("Mimetype Mismatch: %s" % uploaded_file.mimetype)
-            return "Not a PDF", 400
-
-        save_to = find_valid_filename(uploaded_file.filename)
-
-        selected_pdf = save_to
-        pdfs.append(save_to)
-        pdfs.sort()
-        save_to = path.join(pdf_dir, save_to + ".pdf")
-        uploaded_file.save(save_to)
+        selected_pdf = save_uploaded(request.files["uploadedPDF"])
 
     pdf_extract_task_id = process(selected_pdf, page_range)
     return url_for("view_status", task_id=pdf_extract_task_id), 202
